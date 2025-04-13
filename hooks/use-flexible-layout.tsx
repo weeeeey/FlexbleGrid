@@ -1,11 +1,8 @@
-'use client';
-
-import DynamicComponent from '@/components/flexble/dynamic-component';
 import { SplitNode } from '@/lib/binary/binary-node';
-import BinaryTree, { IWillRenderComponent } from '@/lib/binary/binary-tree';
 import { useEffect, useState } from 'react';
+import BinaryTree from '@/lib/binary/binary-tree';
 
-function PageComponent() {
+const useFlexibleLayout = () => {
     const [layoutTree, setLayoutTree] = useState(() => {
         const rootSplit = new SplitNode({
             id: '0',
@@ -39,22 +36,6 @@ function PageComponent() {
         window.addEventListener('resize', handleResizeEvent);
         return () => window.removeEventListener('resize', handleResizeEvent);
     }, []);
+};
 
-    return (
-        <div className="flex flex-col items-center justify-center gap-10 relative">
-            {layoutTree.search().map((c: IWillRenderComponent) => (
-                <DynamicComponent
-                    key={c.id}
-                    id={c.id}
-                    componentName={c.componentName}
-                    height={c.height}
-                    width={c.width}
-                    top={c.top}
-                    left={c.left}
-                />
-            ))}
-        </div>
-    );
-}
-
-export default PageComponent;
+export default useFlexibleLayout;

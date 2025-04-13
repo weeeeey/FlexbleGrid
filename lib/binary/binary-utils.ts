@@ -1,3 +1,4 @@
+import { RefObject } from 'react';
 import type {
     IOrientaion,
     NodeProperty,
@@ -88,4 +89,59 @@ const makeLevelOfTree = (
     };
 };
 
-export { makeLevelOfTree, calculateWidthAndHeight };
+type CalculateQuadrantProps = {
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+};
+const calculateQuadrantPosition = ({
+    currentX,
+    currentY,
+    startX,
+    startY,
+}: CalculateQuadrantProps) => {
+    const WIDTH = 288;
+    const HEIGHT = 288;
+
+    const inclineY = Math.round(
+        ((startX - currentX) * HEIGHT) / WIDTH + startY + HEIGHT
+    );
+    const declineY = Math.round(
+        ((currentX - startX) * HEIGHT) / WIDTH + startY
+    );
+
+    // console.log(`inc:${inclineY}, dec:${declineY},cur:${currentY}`);
+    if (currentY <= inclineY && currentY <= declineY) return '상';
+    if (currentY <= inclineY && currentY >= declineY) return '좌';
+    if (currentY >= inclineY && currentY <= declineY) return '우';
+    return '하';
+};
+
+const displayShadowInDroppable = (
+    position: string,
+    ref: RefObject<HTMLDivElement>
+) => {
+    let shadow: string;
+    switch (position) {
+        case '상':
+            shadow = '0px -10px 10px rgba(0, 0, 0, 1)';
+            break;
+        case '좌':
+            shadow = '-10px 0px 10px rgba(0, 0, 0, 1)';
+            break;
+        case '우':
+            shadow = '10px 0px 10px rgba(0, 0, 0, 1)';
+            break;
+        default:
+            shadow = '0px 10px 10px rgba(0, 0, 0, 1)';
+    }
+    ref.current?.style.setProperty('box-shadow', shadow);
+};
+
+export {
+    makeLevelOfTree,
+    calculateWidthAndHeight,
+    calculateQuadrantPosition,
+    displayShadowInDroppable,
+};

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import AComponent from './a-component';
 import BComponent from './b-component';
 import CComponent from './c-component';
@@ -11,6 +11,7 @@ export type IComponentName =
     | 'DComponent';
 
 interface DynamicComponentProps {
+    id: string;
     componentName: IComponentName;
     width: number;
     height: number;
@@ -31,11 +32,20 @@ const DynamicComponent = memo(function C({
     height,
     top,
     left,
+    id,
 }: DynamicComponentProps) {
+    const sectionRef = useRef<HTMLDivElement>(null);
     const Component = componentMap[componentName];
 
     return (
         <div
+            ref={sectionRef}
+            draggable
+            onDragStart={() => console.log(id)}
+            onDrop={() => console.log('asd')}
+            onDragEnd={(e) => {
+                console.log('object');
+            }}
             className="absolute border border-black p-4"
             style={{
                 width,

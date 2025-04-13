@@ -1,5 +1,5 @@
 import { IComponentName } from '@/components/flexble/dynamic-component';
-import { ILayoutNode, SplitNodeInstance } from './binary-node';
+import { ILayoutNode, SplitNode, SplitNodeInstance } from './binary-node';
 import { calculateWidthAndHeight, makeLevelOfTree } from './binary-utils';
 
 const initialTreeComposition = [
@@ -190,6 +190,79 @@ class BinaryTree {
         );
 
         return willRenderComponents;
+    }
+
+    findParentOfNode(nodeId: string) {
+        const q: ILayoutNode[] = [this.root];
+        while (q.length) {
+            const currentNode = q.shift();
+            if (!currentNode || currentNode.type === 'panel') continue;
+            const leftNode = currentNode.getChildren('left')!;
+            const rightNode = currentNode.getChildren('right')!;
+            if (leftNode.id === nodeId) return currentNode;
+            if (rightNode.id === nodeId) return currentNode;
+            q.push(leftNode);
+            q.push(rightNode);
+        }
+    }
+
+    connectSiblingToGrandparent(
+        parentNode: ILayoutNode,
+        siblingNode: ILayoutNode
+    ) {
+        const grandParent = this.findParentOfNode(parentNode.id)!;
+        if (grandParent.getChildren('left')?.id === parentNode.id) {
+            grandParent.appendNode('right', siblingNode);
+        } else {
+            grandParent.appendNode('left', siblingNode);
+        }
+    }
+
+    findSiblingNode(parentNode: SplitNodeInstance, panelId: string) {
+        const left = parentNode.getChildren('left');
+        if (left?.id === panelId) return parentNode.getChildren('right');
+        return left;
+    }
+
+    findPanelNode(panelId: string) {
+        const q: ILayoutNode[] = [this.root];
+        while (q.length) {
+            const currentNode = q.shift();
+            if (!currentNode) continue;
+            if (currentNode.type === 'panel') {
+                if (currentNode.id === panelId) return currentNode;
+                continue;
+            }
+            const leftNode = currentNode.getChildren('left')!;
+            const rightNode = currentNode.getChildren('right')!;
+            q.push(leftNode);
+            q.push(rightNode);
+        }
+    }
+
+    movePannelNode(sourceId: string, destinyId: string) {
+        const sourceNode = this.findPanelNode(sourceId)!;
+        const destinyNode = this.findPanelNode(destinyId)!;
+
+        const parentOfSource = this.findParentOfNode(sourceId)!;
+        const parentOfdestiny = this.findParentOfNode(destinyId)!;
+        const siblingOfSource = this.findSiblingNode(parentOfSource, sourceId)!;
+
+        this.connectSiblingToGrandparent(parentOfSource, siblingOfSource);
+
+        const newSplitNode = new SplitNode({
+            id: String(Math.random() * 10000),
+            orientation: 'horizontality',
+            ratio: 0.5,
+        });
+        newSplitNode.appendNode('left', destinyNode);
+        newSplitNode.appendNode('right', sourceNode);
+
+        if (parentOfdestiny.getChildren('left')!.id === destinyId) {
+            parentOfdestiny.appendNode('left', newSplitNode);
+        } else {
+            parentOfdestiny.appendNode('right', newSplitNode);
+        }
     }
 }
 
