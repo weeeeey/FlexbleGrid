@@ -44,7 +44,7 @@ function Page() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center gap-y-10 relative">
+        <div className="flex flex-col items-center justify-center gap-10 relative">
             {layoutTree.search().map((c: IWillRenderComponent) => (
                 <DynamicComponent
                     key={c.id}

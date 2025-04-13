@@ -1,17 +1,7 @@
-import type { CommonComponentProps } from './dynamic-component';
-
-function AComponent({ width, height, top, left }: CommonComponentProps) {
+function AComponent() {
     console.log('a 리렌더링');
     return (
-        <div
-            className="bg-black absolute"
-            style={{
-                width,
-                height,
-                top,
-                left,
-            }}
-        >
+        <div className="bg-green-300 size-full border border-black">
             AComponent
         </div>
     );

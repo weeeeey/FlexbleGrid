@@ -28,7 +28,7 @@ const initialTreeComposition = [
             id: '11',
             type: 'split',
             orientation: 'verticality',
-            ratio: 0.5,
+            ratio: 0.3,
             left: null,
             right: null,
         }
@@ -37,20 +37,20 @@ const initialTreeComposition = [
         {
             id: '2',
             type: 'panel',
-            componentName: 'AComponent',
+            componentName: 'CComponent',
         },
         {
             id: '3',
             type: 'panel',
-            componentName: 'BComponent',
+            componentName: 'DComponent',
         }
     ),
 ];
 
 export type IWillRenderComponent = {
     id: string;
+    top: number;
     left: number;
-    right: number;
     width: number;
     height: number;
     componentName: IComponentName;
@@ -68,13 +68,10 @@ class BinaryTree {
     }
 
     appenNodeInTree(
-        parent: ILayoutNode,
+        parent: SplitNodeInstance,
         children: ILayoutNode,
         direction: 'left' | 'right'
     ) {
-        if (parent.type === 'panel') {
-            throw new Error('패널 노드에는 자식이 붙을 수 없다.');
-        }
         if (direction === 'left') {
             parent.appendNode('left', children);
         } else {
@@ -87,11 +84,27 @@ class BinaryTree {
         this.appenNodeInTree(this.root, first.left, 'left');
         this.appenNodeInTree(this.root, first.right, 'right');
 
-        this.appenNodeInTree(first.right, second.left, 'left');
-        this.appenNodeInTree(first.right, second.right, 'right');
+        this.appenNodeInTree(
+            first.right as SplitNodeInstance,
+            second.left,
+            'left'
+        );
+        this.appenNodeInTree(
+            first.right as SplitNodeInstance,
+            second.right,
+            'right'
+        );
 
-        this.appenNodeInTree(second.right, third.left, 'left');
-        this.appenNodeInTree(second.right, third.right, 'right');
+        this.appenNodeInTree(
+            second.right as SplitNodeInstance,
+            third.left,
+            'left'
+        );
+        this.appenNodeInTree(
+            second.right as SplitNodeInstance,
+            third.right,
+            'right'
+        );
     }
 
     getSize() {
@@ -117,7 +130,9 @@ class BinaryTree {
         const visitChildren = (
             node: ILayoutNode,
             width: number,
-            height: number
+            height: number,
+            top: number,
+            left: number
         ) => {
             if (node.type === 'split') {
                 const { leftOrUpChildren, rightOrDownChildren } =
@@ -130,12 +145,20 @@ class BinaryTree {
                 visitChildren(
                     node.getChildren('left')!,
                     leftOrUpChildren.width,
-                    leftOrUpChildren.height
+                    leftOrUpChildren.height,
+                    top,
+                    left
                 );
                 visitChildren(
                     node.getChildren('right')!,
                     rightOrDownChildren.width,
-                    rightOrDownChildren.height
+                    rightOrDownChildren.height,
+                    node.orientation === 'verticality'
+                        ? top
+                        : top + leftOrUpChildren.height,
+                    node.orientation === 'verticality'
+                        ? left + leftOrUpChildren.width
+                        : left
                 );
             } else {
                 willRenderComponents.push({
@@ -143,8 +166,8 @@ class BinaryTree {
                     componentName: node.componentName,
                     height,
                     width,
-                    left: 0,
-                    right: 0,
+                    top,
+                    left,
                 });
             }
         };
@@ -152,12 +175,18 @@ class BinaryTree {
         visitChildren(
             this.root.getChildren('left')!,
             leftOrUpChildren.width,
-            leftOrUpChildren.height
+            leftOrUpChildren.height,
+            0,
+            0
         );
         visitChildren(
             this.root.getChildren('right')!,
             rightOrDownChildren.width,
-            rightOrDownChildren.height
+            rightOrDownChildren.height,
+            this.root.orientation === 'verticality'
+                ? 0
+                : leftOrUpChildren.height,
+            this.root.orientation === 'verticality' ? leftOrUpChildren.width : 0
         );
 
         return willRenderComponents;

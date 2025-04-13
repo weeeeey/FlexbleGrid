@@ -1,8 +1,14 @@
 import { memo } from 'react';
 import AComponent from './a-component';
 import BComponent from './b-component';
+import CComponent from './c-component';
+import DComponent from './d-component';
 
-export type IComponentName = 'AComponent' | 'BComponent';
+export type IComponentName =
+    | 'AComponent'
+    | 'BComponent'
+    | 'CComponent'
+    | 'DComponent';
 
 interface DynamicComponentProps {
     componentName: IComponentName;
@@ -11,11 +17,12 @@ interface DynamicComponentProps {
     top: number;
     left: number;
 }
-export type CommonComponentProps = Omit<DynamicComponentProps, 'componentName'>;
 
 const componentMap = {
     AComponent,
     BComponent,
+    CComponent,
+    DComponent,
 };
 
 const DynamicComponent = memo(function C({
@@ -27,13 +34,19 @@ const DynamicComponent = memo(function C({
 }: DynamicComponentProps) {
     const Component = componentMap[componentName];
 
-    if (!Component) {
-        console.warn(`컴포넌트 "${componentName}"가 존재하지 않습니다.`);
-        return null;
-    }
-
-    // 컴포넌트 렌더링
-    return <Component top={top} left={left} width={width} height={height} />;
+    return (
+        <div
+            className="absolute border border-black p-4"
+            style={{
+                width,
+                height,
+                top,
+                left,
+            }}
+        >
+            <Component />
+        </div>
+    );
 });
 
 export default DynamicComponent;
