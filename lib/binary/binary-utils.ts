@@ -89,9 +89,11 @@ const makeLevelOfTree = (
     };
 };
 
-type CalculateQuadrantProps = {
+export type CalculateQuadrantProps = {
     startX: number;
     startY: number;
+    width: number;
+    height: number;
     currentX: number;
     currentY: number;
 };
@@ -100,15 +102,14 @@ const calculateQuadrantPosition = ({
     currentY,
     startX,
     startY,
+    height,
+    width,
 }: CalculateQuadrantProps) => {
-    const WIDTH = 288;
-    const HEIGHT = 288;
-
     const inclineY = Math.round(
-        ((startX - currentX) * HEIGHT) / WIDTH + startY + HEIGHT
+        ((startX - currentX) * height) / width + startY + height
     );
     const declineY = Math.round(
-        ((currentX - startX) * HEIGHT) / WIDTH + startY
+        ((currentX - startX) * height) / width + startY
     );
 
     // console.log(`inc:${inclineY}, dec:${declineY},cur:${currentY}`);

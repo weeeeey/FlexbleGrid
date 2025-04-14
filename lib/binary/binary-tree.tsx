@@ -5,7 +5,7 @@ import { calculateWidthAndHeight, makeLevelOfTree } from './binary-utils';
 const initialTreeComposition = [
     makeLevelOfTree(
         {
-            id: '11111',
+            id: 'a component',
             type: 'panel',
             componentName: 'AComponent',
         },
@@ -20,7 +20,7 @@ const initialTreeComposition = [
     ),
     makeLevelOfTree(
         {
-            id: '1',
+            id: 'b component',
             type: 'panel',
             componentName: 'BComponent',
         },
@@ -35,12 +35,12 @@ const initialTreeComposition = [
     ),
     makeLevelOfTree(
         {
-            id: '2',
+            id: 'c component',
             type: 'panel',
             componentName: 'CComponent',
         },
         {
-            id: '3',
+            id: 'd component',
             type: 'panel',
             componentName: 'DComponent',
         }
@@ -55,6 +55,8 @@ export type IWillRenderComponent = {
     height: number;
     componentName: IComponentName;
 };
+
+export type BinaryTreeInstance = InstanceType<typeof BinaryTree>;
 
 class BinaryTree {
     private root: SplitNodeInstance;

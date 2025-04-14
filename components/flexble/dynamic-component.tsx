@@ -3,6 +3,8 @@ import AComponent from './a-component';
 import BComponent from './b-component';
 import CComponent from './c-component';
 import DComponent from './d-component';
+import { IWillRenderComponent } from '@/lib/binary/binary-tree';
+import { ReturnTypeDragNDrop } from '@/hooks/use-dragNdrop';
 
 export type IComponentName =
     | 'AComponent'
@@ -11,12 +13,8 @@ export type IComponentName =
     | 'DComponent';
 
 interface DynamicComponentProps {
-    id: string;
-    componentName: IComponentName;
-    width: number;
-    height: number;
-    top: number;
-    left: number;
+    sectionDate: IWillRenderComponent;
+    dragNDropMethod: ReturnTypeDragNDrop;
 }
 
 const componentMap = {
@@ -27,26 +25,41 @@ const componentMap = {
 };
 
 const DynamicComponent = memo(function C({
-    componentName,
-    width,
-    height,
-    top,
-    left,
-    id,
+    sectionDate,
+    dragNDropMethod,
 }: DynamicComponentProps) {
+    const { componentName, height, id, left, top, width } = sectionDate;
+    // console.log(componentName);
+    const {
+        dragStartHandler,
+        dragEnterHandler,
+        dragLeaveHandler,
+        dragOverHandler,
+        dropHandler,
+    } = dragNDropMethod;
     const sectionRef = useRef<HTMLDivElement>(null);
     const Component = componentMap[componentName];
-
     return (
         <div
             ref={sectionRef}
             draggable
-            onDragStart={() => console.log(id)}
-            onDrop={() => console.log('asd')}
-            onDragEnd={(e) => {
-                console.log('object');
+            onDragStart={() => dragStartHandler(id)}
+            onDragEnter={() => dragEnterHandler(id)}
+            onDragLeave={() => dragLeaveHandler(id, sectionRef)}
+            onDragOver={(e) => {
+                e.preventDefault();
+                const [currentX, currentY] = [e.pageX, e.pageY];
+                dragOverHandler(id, sectionRef, {
+                    startX: left,
+                    startY: top,
+                    currentX,
+                    currentY,
+                    width,
+                    height,
+                });
             }}
-            className="absolute border border-black p-4"
+            onDrop={dropHandler}
+            className="absolute border border-black p-4 overflow-hidden"
             style={{
                 width,
                 height,

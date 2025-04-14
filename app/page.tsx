@@ -1,56 +1,20 @@
 'use client';
 
 import DynamicComponent from '@/components/flexble/dynamic-component';
-import { SplitNode } from '@/lib/binary/binary-node';
-import BinaryTree, { IWillRenderComponent } from '@/lib/binary/binary-tree';
-import { useEffect, useState } from 'react';
+import useDragNdrop from '@/hooks/use-dragNdrop';
+import useFlexibleLayout from '@/hooks/use-flexible-layout';
 
 function PageComponent() {
-    const [layoutTree, setLayoutTree] = useState(() => {
-        const rootSplit = new SplitNode({
-            id: '0',
-            orientation: 'verticality',
-            ratio: 0.5,
-        });
-        const tree = new BinaryTree(
-            rootSplit,
-            window.innerWidth,
-            window.innerHeight
-        );
-        tree.init();
-        return tree;
-    });
-
-    useEffect(() => {
-        const handleResizeEvent = (e: UIEvent) => {
-            const target = e.currentTarget as Window;
-
-            const { innerWidth, innerHeight } = target;
-            setLayoutTree((tree) => {
-                const newTree = new BinaryTree(
-                    tree.getTree(),
-                    innerWidth,
-                    innerHeight
-                );
-                return newTree;
-            });
-        };
-
-        window.addEventListener('resize', handleResizeEvent);
-        return () => window.removeEventListener('resize', handleResizeEvent);
-    }, []);
+    const layoutTree = useFlexibleLayout();
+    const dragNDropMethod = useDragNdrop(layoutTree);
 
     return (
         <div className="flex flex-col items-center justify-center gap-10 relative">
-            {layoutTree.search().map((c: IWillRenderComponent) => (
+            {layoutTree?.search().map((c) => (
                 <DynamicComponent
                     key={c.id}
-                    id={c.id}
-                    componentName={c.componentName}
-                    height={c.height}
-                    width={c.width}
-                    top={c.top}
-                    left={c.left}
+                    sectionDate={c}
+                    dragNDropMethod={dragNDropMethod}
                 />
             ))}
         </div>
