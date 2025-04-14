@@ -80,12 +80,11 @@ export class SplitNode {
         return this.right;
     }
 
-    toggleOrientation(position: '상' | '하' | '좌' | '우') {
-        if (position === '상' || position === '하') {
-            this.orientation = 'horizontality';
-        } else {
-            this.orientation = 'verticality';
-        }
+    toggleOrientation() {
+        this.orientation =
+            this.orientation === 'horizontality'
+                ? 'verticality'
+                : 'horizontality';
     }
     changeRatio(value: number) {
         let tempValue = value;

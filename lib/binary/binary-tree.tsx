@@ -5,7 +5,11 @@ import {
     SplitNode,
     SplitNodeInstance,
 } from './binary-node';
-import { calculateWidthAndHeight, makeLevelOfTree } from './binary-utils';
+import {
+    calculateWidthAndHeight,
+    IPosition,
+    makeLevelOfTree,
+} from './binary-utils';
 
 const initialTreeComposition = [
     makeLevelOfTree(
@@ -247,6 +251,22 @@ class BinaryTree {
         }
     }
 
+    positionNodes(
+        position: IPosition,
+        parent: SplitNodeInstance,
+        source: ILayoutNode,
+        destiny: ILayoutNode
+    ) {
+        const isSourceLeftOrUpSide = ['상', '좌'].includes(position);
+        if (isSourceLeftOrUpSide === true) {
+            parent.appendNode('left', source);
+            parent.appendNode('right', destiny);
+        } else {
+            parent.appendNode('right', source);
+            parent.appendNode('left', destiny);
+        }
+    }
+
     movePannelNode({
         destinyId,
         position,
@@ -254,11 +274,12 @@ class BinaryTree {
     }: {
         sourceId: string;
         destinyId: string;
-        position: '상' | '하' | '좌' | '우';
+        position: IPosition;
     }) {
         const orientation: IOrientaion = ['상', '하'].includes(position)
             ? 'horizontality'
             : 'verticality';
+
         const sourceNode = this.findPanelNode(sourceId)!;
         const destinyNode = this.findPanelNode(destinyId)!;
 
@@ -266,13 +287,16 @@ class BinaryTree {
         const parentOfDestiny = this.findParentOfNode(destinyId)!;
 
         if (parentOfDestiny.id === parentOfSource.id) {
-            if (parentOfSource.getChildren('left')?.id === sourceId) {
-                parentOfSource.appendNode('left', destinyNode);
-                parentOfSource.appendNode('right', sourceNode);
-            } else {
-                parentOfSource.appendNode('left', sourceNode);
-                parentOfSource.appendNode('right', destinyNode);
+            if (parentOfDestiny.orientation !== orientation) {
+                parentOfSource.toggleOrientation();
             }
+
+            this.positionNodes(
+                position,
+                parentOfSource,
+                sourceNode,
+                destinyNode
+            );
         } else {
             const siblingOfSource = this.findSiblingNode(
                 parentOfSource,
@@ -286,8 +310,7 @@ class BinaryTree {
                 orientation,
                 ratio: 0.5,
             });
-            newSplitNode.appendNode('left', destinyNode);
-            newSplitNode.appendNode('right', sourceNode);
+            this.positionNodes(position, newSplitNode, sourceNode, destinyNode);
 
             if (parentOfDestiny.getChildren('left')!.id === destinyId) {
                 parentOfDestiny.appendNode('left', newSplitNode);

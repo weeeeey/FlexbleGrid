@@ -5,7 +5,6 @@ function CComponent({
 }: {
     childrenRef: RefObject<HTMLDivElement>;
 }) {
-    console.log('c 리렌더링');
     return (
         <div
             ref={childrenRef}

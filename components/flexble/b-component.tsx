@@ -5,7 +5,6 @@ function BComponent({
 }: {
     childrenRef: RefObject<HTMLDivElement>;
 }) {
-    console.log('b 리렌더링');
     return (
         <div
             ref={childrenRef}
