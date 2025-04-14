@@ -1,23 +1,21 @@
-import { BinaryTreeInstance } from '@/lib/binary/binary-tree';
 import {
     calculateQuadrantPosition,
     displayShadowInDroppable,
     IPosition,
     type CalculateQuadrantProps,
 } from '@/lib/binary/binary-utils';
-import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useMemo, useRef } from 'react';
 
 export type ReturnTypeDragNDrop = ReturnType<typeof useDragNdrop>;
 
 const useDragNdrop = (
-    layoutTree: BinaryTreeInstance | undefined,
     replaceTree: (
         sourceId: string,
         destinyId: string,
         position: IPosition
     ) => void
 ) => {
-    const [throttle, setThrottle] = useState(false);
+    const throttle = useRef(false);
     const currentDraggingItemId = useRef('-1');
     const droppableTagetItemId = useRef('-1');
     const dropedPosition = useRef<IPosition | undefined>();
@@ -37,10 +35,10 @@ const useDragNdrop = (
         calculateProps: CalculateQuadrantProps
     ) => {
         if (targetId === currentDraggingItemId.current) return;
-        if (throttle === true) return;
-        setThrottle(true);
+        if (throttle.current === true) return;
+        throttle.current = true;
         setTimeout(() => {
-            setThrottle(false);
+            throttle.current = false;
         }, 800);
 
         const position = calculateQuadrantPosition(calculateProps);

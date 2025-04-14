@@ -1,8 +1,5 @@
 import { memo, useRef } from 'react';
-import AComponent from './a-component';
-import BComponent from './b-component';
-import CComponent from './c-component';
-import DComponent from './d-component';
+import { AComponent, BComponent, CComponent, DComponent } from './index';
 import { IWillRenderComponent } from '@/lib/binary/binary-tree';
 import { ReturnTypeDragNDrop } from '@/hooks/use-dragNdrop';
 
@@ -29,7 +26,6 @@ const DynamicComponent = memo(function C({
     dragNDropMethod,
 }: DynamicComponentProps) {
     const { componentName, height, id, left, top, width } = sectionDate;
-    // console.log(componentName);
     const {
         dragStartHandler,
         dragEnterHandler,

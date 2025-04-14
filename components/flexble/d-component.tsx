@@ -5,7 +5,7 @@ function DComponent({
 }: {
     childrenRef: RefObject<HTMLDivElement>;
 }) {
-    // console.log('d 리렌더링');
+    console.log('d 리렌더링');
     return (
         <div
             ref={childrenRef}

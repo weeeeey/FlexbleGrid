@@ -6,7 +6,7 @@ import useFlexibleLayout from '@/hooks/use-flexible-layout';
 
 function PageComponent() {
     const { layoutTree, replacePlaceOfNodes } = useFlexibleLayout();
-    const dragNDropMethod = useDragNdrop(layoutTree, replacePlaceOfNodes);
+    const dragNDropMethod = useDragNdrop(replacePlaceOfNodes);
 
     return (
         <div className="flex flex-col items-center justify-center gap-10 relative">

@@ -5,7 +5,7 @@ function AComponent({
 }: {
     childrenRef: RefObject<HTMLDivElement>;
 }) {
-    // console.log('a 리렌더링');
+    console.log('a 리렌더링');
     return (
         <div
             ref={childrenRef}
