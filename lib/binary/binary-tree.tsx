@@ -70,8 +70,8 @@ class BinaryTree {
 
     constructor(splitNode: SplitNodeInstance, width: number, height: number) {
         this.root = splitNode;
-        this.width = width;
-        this.height = height;
+        this.width = width < 375 ? 375 : width;
+        this.height = height < 667 ? 667 : height;
     }
 
     appenNodeInTree(
@@ -293,6 +293,35 @@ class BinaryTree {
                 parentOfDestiny.appendNode('left', newSplitNode);
             } else {
                 parentOfDestiny.appendNode('right', newSplitNode);
+            }
+        }
+    }
+    diffReplace(newTree: BinaryTreeInstance) {
+        const q: [ILayoutNode, ILayoutNode][] = [[this.root, newTree.root]];
+        while (q.length) {
+            const popArray = q.shift();
+            if (popArray === undefined) continue;
+            const [prevNode, newNode] = popArray;
+            if (prevNode.id !== newNode.id) {
+                const parentOfPrevNode = this.findParentOfNode(prevNode.id)!;
+                if (parentOfPrevNode.getChildren('left')!.id === prevNode.id) {
+                    parentOfPrevNode.appendNode('left', newNode);
+                } else {
+                    parentOfPrevNode.appendNode('right', newNode);
+                }
+            } else {
+                if (prevNode.type === 'panel' || newNode.type === 'panel')
+                    continue;
+                const [nextLeftPrev, nextLeftNew] = [
+                    prevNode.getChildren('left')!,
+                    newNode.getChildren('left')!,
+                ];
+                const [nextRightPrev, nextRightNew] = [
+                    prevNode.getChildren('right')!,
+                    newNode.getChildren('right')!,
+                ];
+                q.push([nextLeftPrev, nextLeftNew]);
+                q.push([nextRightPrev, nextRightNew]);
             }
         }
     }

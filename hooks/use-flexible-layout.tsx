@@ -16,6 +16,7 @@ const useFlexibleLayout = () => {
                     destinyId,
                     position,
                 });
+
                 return newTree;
             });
         },
