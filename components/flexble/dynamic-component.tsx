@@ -38,6 +38,8 @@ const DynamicComponent = memo(function C({
         dropHandler,
     } = dragNDropMethod;
     const sectionRef = useRef<HTMLDivElement>(null);
+    const childrenRef = useRef<HTMLDivElement>(null);
+
     const Component = componentMap[componentName];
     return (
         <div
@@ -45,11 +47,11 @@ const DynamicComponent = memo(function C({
             draggable
             onDragStart={() => dragStartHandler(id)}
             onDragEnter={() => dragEnterHandler(id)}
-            onDragLeave={() => dragLeaveHandler(id, sectionRef)}
+            onDragLeave={() => dragLeaveHandler(childrenRef)}
             onDragOver={(e) => {
                 e.preventDefault();
                 const [currentX, currentY] = [e.pageX, e.pageY];
-                dragOverHandler(id, sectionRef, {
+                dragOverHandler(id, childrenRef, {
                     startX: left,
                     startY: top,
                     currentX,
@@ -58,8 +60,8 @@ const DynamicComponent = memo(function C({
                     height,
                 });
             }}
-            onDrop={dropHandler}
-            className="absolute border border-black p-4 overflow-hidden"
+            onDrop={() => dropHandler(childrenRef)}
+            className="absolute border border-black p-4"
             style={{
                 width,
                 height,
@@ -67,7 +69,7 @@ const DynamicComponent = memo(function C({
                 left,
             }}
         >
-            <Component />
+            <Component childrenRef={childrenRef} />
         </div>
     );
 });

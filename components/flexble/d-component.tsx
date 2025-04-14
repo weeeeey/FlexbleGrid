@@ -1,7 +1,16 @@
-function DComponent() {
+import { RefObject } from 'react';
+
+function DComponent({
+    childrenRef,
+}: {
+    childrenRef: RefObject<HTMLDivElement>;
+}) {
     // console.log('d 리렌더링');
     return (
-        <div className="bg-red-300 size-full border border-black">
+        <div
+            ref={childrenRef}
+            className="bg-red-300 size-full border border-black"
+        >
             DComponent
         </div>
     );

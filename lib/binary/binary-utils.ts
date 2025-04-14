@@ -104,7 +104,7 @@ const calculateQuadrantPosition = ({
     startY,
     height,
     width,
-}: CalculateQuadrantProps) => {
+}: CalculateQuadrantProps): IPosition => {
     const inclineY = Math.round(
         ((startX - currentX) * height) / width + startY + height
     );
@@ -119,8 +119,9 @@ const calculateQuadrantPosition = ({
     return '하';
 };
 
+export type IPosition = '상' | '좌' | '우' | '하';
 const displayShadowInDroppable = (
-    position: string,
+    position: IPosition,
     ref: RefObject<HTMLDivElement>
 ) => {
     let shadow: string;

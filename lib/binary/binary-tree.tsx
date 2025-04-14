@@ -1,5 +1,10 @@
 import { IComponentName } from '@/components/flexble/dynamic-component';
-import { ILayoutNode, SplitNode, SplitNodeInstance } from './binary-node';
+import {
+    ILayoutNode,
+    IOrientaion,
+    SplitNode,
+    SplitNodeInstance,
+} from './binary-node';
 import { calculateWidthAndHeight, makeLevelOfTree } from './binary-utils';
 
 const initialTreeComposition = [
@@ -10,7 +15,7 @@ const initialTreeComposition = [
             componentName: 'AComponent',
         },
         {
-            id: '10',
+            id: '두번째 분할',
             type: 'split',
             orientation: 'horizontality',
             ratio: 0.5,
@@ -25,7 +30,7 @@ const initialTreeComposition = [
             componentName: 'BComponent',
         },
         {
-            id: '11',
+            id: '세번째 분할',
             type: 'split',
             orientation: 'verticality',
             ratio: 0.3,
@@ -214,9 +219,9 @@ class BinaryTree {
     ) {
         const grandParent = this.findParentOfNode(parentNode.id)!;
         if (grandParent.getChildren('left')?.id === parentNode.id) {
-            grandParent.appendNode('right', siblingNode);
-        } else {
             grandParent.appendNode('left', siblingNode);
+        } else {
+            grandParent.appendNode('right', siblingNode);
         }
     }
 
@@ -242,28 +247,53 @@ class BinaryTree {
         }
     }
 
-    movePannelNode(sourceId: string, destinyId: string) {
+    movePannelNode({
+        destinyId,
+        position,
+        sourceId,
+    }: {
+        sourceId: string;
+        destinyId: string;
+        position: '상' | '하' | '좌' | '우';
+    }) {
+        const orientation: IOrientaion = ['상', '하'].includes(position)
+            ? 'horizontality'
+            : 'verticality';
         const sourceNode = this.findPanelNode(sourceId)!;
         const destinyNode = this.findPanelNode(destinyId)!;
 
         const parentOfSource = this.findParentOfNode(sourceId)!;
-        const parentOfdestiny = this.findParentOfNode(destinyId)!;
-        const siblingOfSource = this.findSiblingNode(parentOfSource, sourceId)!;
+        const parentOfDestiny = this.findParentOfNode(destinyId)!;
 
-        this.connectSiblingToGrandparent(parentOfSource, siblingOfSource);
-
-        const newSplitNode = new SplitNode({
-            id: String(Math.random() * 10000),
-            orientation: 'horizontality',
-            ratio: 0.5,
-        });
-        newSplitNode.appendNode('left', destinyNode);
-        newSplitNode.appendNode('right', sourceNode);
-
-        if (parentOfdestiny.getChildren('left')!.id === destinyId) {
-            parentOfdestiny.appendNode('left', newSplitNode);
+        if (parentOfDestiny.id === parentOfSource.id) {
+            if (parentOfSource.getChildren('left')?.id === sourceId) {
+                parentOfSource.appendNode('left', destinyNode);
+                parentOfSource.appendNode('right', sourceNode);
+            } else {
+                parentOfSource.appendNode('left', sourceNode);
+                parentOfSource.appendNode('right', destinyNode);
+            }
         } else {
-            parentOfdestiny.appendNode('right', newSplitNode);
+            const siblingOfSource = this.findSiblingNode(
+                parentOfSource,
+                sourceId
+            )!;
+
+            this.connectSiblingToGrandparent(parentOfSource, siblingOfSource);
+
+            const newSplitNode = new SplitNode({
+                id: String(Math.random() * 10000),
+                orientation,
+                ratio: 0.5,
+            });
+            newSplitNode.appendNode('left', destinyNode);
+            newSplitNode.appendNode('right', sourceNode);
+
+            if (parentOfDestiny.getChildren('left')!.id === destinyId) {
+                parentOfDestiny.appendNode('left', newSplitNode);
+            } else {
+                parentOfDestiny.appendNode('right', newSplitNode);
+            }
         }
     }
 }
