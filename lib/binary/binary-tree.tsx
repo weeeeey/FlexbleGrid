@@ -117,6 +117,9 @@ class BinaryTree {
             'right'
         );
     }
+    replaceRoot(splitNode: SplitNodeInstance) {
+        this.root = splitNode;
+    }
 
     getSize() {
         return {
@@ -221,7 +224,12 @@ class BinaryTree {
         parentNode: ILayoutNode,
         siblingNode: ILayoutNode
     ) {
+        if (parentNode === this.root) {
+            this.replaceRoot(siblingNode as SplitNodeInstance);
+            return;
+        }
         const grandParent = this.findParentOfNode(parentNode.id)!;
+
         if (grandParent.getChildren('left')?.id === parentNode.id) {
             grandParent.appendNode('left', siblingNode);
         } else {
