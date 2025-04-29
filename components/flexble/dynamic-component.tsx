@@ -1,5 +1,11 @@
 import { memo, useRef } from 'react';
-import { AComponent, BComponent, CComponent, DComponent } from './index';
+import {
+    AComponent,
+    BComponent,
+    CComponent,
+    DComponent,
+    SplitComponent,
+} from './index';
 import { IWillRenderComponent } from '@/lib/binary/binary-tree';
 import { ReturnTypeDragNDrop } from '@/hooks/use-dragNdrop';
 
@@ -7,7 +13,8 @@ export type IComponentName =
     | 'AComponent'
     | 'BComponent'
     | 'CComponent'
-    | 'DComponent';
+    | 'DComponent'
+    | 'SplitComponent';
 
 interface DynamicComponentProps {
     sectionDate: IWillRenderComponent;
@@ -34,38 +41,50 @@ const DynamicComponent = memo(
         const sectionRef = useRef<HTMLDivElement>(null);
         const childrenRef = useRef<HTMLDivElement>(null);
 
-        const Component = componentMap[componentName];
-        return (
-            <div
-                ref={sectionRef}
-                draggable
-                onDragStart={() => dragStartHandler(id)}
-                onDragEnter={() => dragEnterHandler(id)}
-                onDragLeave={() => dragLeaveHandler(childrenRef)}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    const [currentX, currentY] = [e.pageX, e.pageY];
-                    dragOverHandler(id, childrenRef, {
-                        startX: left,
-                        startY: top,
-                        currentX,
-                        currentY,
+        if (componentName === 'SplitComponent') {
+            return (
+                <SplitComponent
+                    width={width}
+                    height={height}
+                    childrenRef={childrenRef}
+                    left={left}
+                    top={top}
+                />
+            );
+        } else {
+            const Component = componentMap[componentName];
+            return (
+                <div
+                    ref={sectionRef}
+                    draggable
+                    onDragStart={() => dragStartHandler(id)}
+                    onDragEnter={() => dragEnterHandler(id)}
+                    onDragLeave={() => dragLeaveHandler(childrenRef)}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        const [currentX, currentY] = [e.pageX, e.pageY];
+                        dragOverHandler(id, childrenRef, {
+                            startX: left,
+                            startY: top,
+                            currentX,
+                            currentY,
+                            width,
+                            height,
+                        });
+                    }}
+                    onDrop={() => dropHandler(childrenRef)}
+                    className="absolute p-4"
+                    style={{
                         width,
                         height,
-                    });
-                }}
-                onDrop={() => dropHandler(childrenRef)}
-                className="absolute border border-black p-4"
-                style={{
-                    width,
-                    height,
-                    top,
-                    left,
-                }}
-            >
-                <Component childrenRef={childrenRef} />
-            </div>
-        );
+                        top,
+                        left,
+                    }}
+                >
+                    <Component childrenRef={childrenRef} />
+                </div>
+            );
+        }
     },
     (prev, next) => {
         return (

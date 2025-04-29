@@ -5,8 +5,8 @@ import useDragNdrop from '@/hooks/use-dragNdrop';
 import useFlexibleLayout from '@/hooks/use-flexible-layout';
 
 function PageComponent() {
-    const { layoutTree, replacePlaceOfNodes } = useFlexibleLayout();
-    const componentsToRender = layoutTree?.search(); // 위치, 크기 등 포함된 리스트
+    const { componentsToRender, replacePlaceOfNodes } = useFlexibleLayout();
+
     const dragNDropMethod = useDragNdrop(replacePlaceOfNodes);
 
     return (
