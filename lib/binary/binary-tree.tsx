@@ -67,6 +67,14 @@ export type IWillRenderComponent = {
 
 export type BinaryTreeInstance = InstanceType<typeof BinaryTree>;
 
+type SplitComponentType = Omit<
+    IWillRenderComponent & {
+        orientation: IOrientaion;
+        radio: number;
+    },
+    'componentName'
+>;
+
 class BinaryTree {
     private root: SplitNodeInstance;
     private width: number;
@@ -117,6 +125,9 @@ class BinaryTree {
             'right'
         );
     }
+    replaceRoot(splitNode: SplitNodeInstance) {
+        this.root = splitNode;
+    }
 
     getSize() {
         return {
@@ -128,6 +139,36 @@ class BinaryTree {
         return this.root;
     }
 
+    renderSplitComponent({
+        id,
+        top,
+        left,
+        width,
+        height,
+        radio,
+
+        orientation,
+    }: SplitComponentType): IWillRenderComponent {
+        if (orientation === 'verticality') {
+            return {
+                id,
+                width: 8,
+                height,
+                top,
+                left: left + width * radio - 4,
+                componentName: 'SplitComponent',
+            };
+        }
+        return {
+            id,
+            width,
+            height: 8,
+            top: top + height * radio - 4,
+            left,
+            componentName: 'SplitComponent',
+        };
+    }
+
     search() {
         const { leftOrUpChildren, rightOrDownChildren } =
             calculateWidthAndHeight({
@@ -137,6 +178,17 @@ class BinaryTree {
                 orientation: this.root.orientation,
             });
         const willRenderComponents: IWillRenderComponent[] = [];
+
+        const splitComponent = this.renderSplitComponent({
+            id: this.root.id,
+            radio: this.root.ratio,
+            orientation: this.root.orientation,
+            top: 0,
+            left: 0,
+            width: this.width,
+            height: this.height,
+        });
+        willRenderComponents.push(splitComponent);
 
         const visitChildren = (
             node: ILayoutNode,
@@ -153,6 +205,16 @@ class BinaryTree {
                         ratio: node.ratio,
                         orientation: node.orientation,
                     });
+                const splitComponent = this.renderSplitComponent({
+                    id: node.id,
+                    radio: node.ratio,
+                    orientation: node.orientation,
+                    top,
+                    left,
+                    width,
+                    height,
+                });
+                willRenderComponents.push(splitComponent);
                 visitChildren(
                     node.getChildren('left')!,
                     leftOrUpChildren.width,
@@ -221,7 +283,12 @@ class BinaryTree {
         parentNode: ILayoutNode,
         siblingNode: ILayoutNode
     ) {
+        if (parentNode === this.root) {
+            this.replaceRoot(siblingNode as SplitNodeInstance);
+            return;
+        }
         const grandParent = this.findParentOfNode(parentNode.id)!;
+
         if (grandParent.getChildren('left')?.id === parentNode.id) {
             grandParent.appendNode('left', siblingNode);
         } else {
@@ -281,6 +348,7 @@ class BinaryTree {
             : 'verticality';
 
         const sourceNode = this.findPanelNode(sourceId)!;
+
         const destinyNode = this.findPanelNode(destinyId)!;
 
         const parentOfSource = this.findParentOfNode(sourceId)!;
@@ -319,35 +387,35 @@ class BinaryTree {
             }
         }
     }
-    diffReplace(newTree: BinaryTreeInstance) {
-        const q: [ILayoutNode, ILayoutNode][] = [[this.root, newTree.root]];
-        while (q.length) {
-            const popArray = q.shift();
-            if (popArray === undefined) continue;
-            const [prevNode, newNode] = popArray;
-            if (prevNode.id !== newNode.id) {
-                const parentOfPrevNode = this.findParentOfNode(prevNode.id)!;
-                if (parentOfPrevNode.getChildren('left')!.id === prevNode.id) {
-                    parentOfPrevNode.appendNode('left', newNode);
-                } else {
-                    parentOfPrevNode.appendNode('right', newNode);
-                }
-            } else {
-                if (prevNode.type === 'panel' || newNode.type === 'panel')
-                    continue;
-                const [nextLeftPrev, nextLeftNew] = [
-                    prevNode.getChildren('left')!,
-                    newNode.getChildren('left')!,
-                ];
-                const [nextRightPrev, nextRightNew] = [
-                    prevNode.getChildren('right')!,
-                    newNode.getChildren('right')!,
-                ];
-                q.push([nextLeftPrev, nextLeftNew]);
-                q.push([nextRightPrev, nextRightNew]);
-            }
-        }
-    }
+    // diffReplace(newTree: BinaryTreeInstance) {
+    //     const q: [ILayoutNode, ILayoutNode][] = [[this.root, newTree.root]];
+    //     while (q.length) {
+    //         const popArray = q.shift();
+    //         if (popArray === undefined) continue;
+    //         const [prevNode, newNode] = popArray;
+    //         if (prevNode.id !== newNode.id) {
+    //             const parentOfPrevNode = this.findParentOfNode(prevNode.id)!;
+    //             if (parentOfPrevNode.getChildren('left')!.id === prevNode.id) {
+    //                 parentOfPrevNode.appendNode('left', newNode);
+    //             } else {
+    //                 parentOfPrevNode.appendNode('right', newNode);
+    //             }
+    //         } else {
+    //             if (prevNode.type === 'panel' || newNode.type === 'panel')
+    //                 continue;
+    //             const [nextLeftPrev, nextLeftNew] = [
+    //                 prevNode.getChildren('left')!,
+    //                 newNode.getChildren('left')!,
+    //             ];
+    //             const [nextRightPrev, nextRightNew] = [
+    //                 prevNode.getChildren('right')!,
+    //                 newNode.getChildren('right')!,
+    //             ];
+    //             q.push([nextLeftPrev, nextLeftNew]);
+    //             q.push([nextRightPrev, nextRightNew]);
+    //         }
+    //     }
+    // }
 }
 
 export default BinaryTree;

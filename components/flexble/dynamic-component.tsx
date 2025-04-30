@@ -1,5 +1,11 @@
 import { memo, useRef } from 'react';
-import { AComponent, BComponent, CComponent, DComponent } from './index';
+import {
+    AComponent,
+    BComponent,
+    CComponent,
+    DComponent,
+    SplitComponent,
+} from './index';
 import { IWillRenderComponent } from '@/lib/binary/binary-tree';
 import { ReturnTypeDragNDrop } from '@/hooks/use-dragNdrop';
 
@@ -7,7 +13,8 @@ export type IComponentName =
     | 'AComponent'
     | 'BComponent'
     | 'CComponent'
-    | 'DComponent';
+    | 'DComponent'
+    | 'SplitComponent';
 
 interface DynamicComponentProps {
     sectionDate: IWillRenderComponent;
@@ -34,6 +41,18 @@ const DynamicComponent = memo(
         const sectionRef = useRef<HTMLDivElement>(null);
         const childrenRef = useRef<HTMLDivElement>(null);
 
+        if (componentName === 'SplitComponent') {
+            return (
+                <SplitComponent
+                    width={width}
+                    height={height}
+                    childrenRef={childrenRef}
+                    left={left}
+                    top={top}
+                />
+            );
+        }
+
         const Component = componentMap[componentName];
         return (
             <div
@@ -55,7 +74,7 @@ const DynamicComponent = memo(
                     });
                 }}
                 onDrop={() => dropHandler(childrenRef)}
-                className="absolute border border-black p-4"
+                className="absolute p-2"
                 style={{
                     width,
                     height,
