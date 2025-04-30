@@ -51,40 +51,40 @@ const DynamicComponent = memo(
                     top={top}
                 />
             );
-        } else {
-            const Component = componentMap[componentName];
-            return (
-                <div
-                    ref={sectionRef}
-                    draggable
-                    onDragStart={() => dragStartHandler(id)}
-                    onDragEnter={() => dragEnterHandler(id)}
-                    onDragLeave={() => dragLeaveHandler(childrenRef)}
-                    onDragOver={(e) => {
-                        e.preventDefault();
-                        const [currentX, currentY] = [e.pageX, e.pageY];
-                        dragOverHandler(id, childrenRef, {
-                            startX: left,
-                            startY: top,
-                            currentX,
-                            currentY,
-                            width,
-                            height,
-                        });
-                    }}
-                    onDrop={() => dropHandler(childrenRef)}
-                    className="absolute p-4"
-                    style={{
+        }
+
+        const Component = componentMap[componentName];
+        return (
+            <div
+                ref={sectionRef}
+                draggable
+                onDragStart={() => dragStartHandler(id)}
+                onDragEnter={() => dragEnterHandler(id)}
+                onDragLeave={() => dragLeaveHandler(childrenRef)}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    const [currentX, currentY] = [e.pageX, e.pageY];
+                    dragOverHandler(id, childrenRef, {
+                        startX: left,
+                        startY: top,
+                        currentX,
+                        currentY,
                         width,
                         height,
-                        top,
-                        left,
-                    }}
-                >
-                    <Component childrenRef={childrenRef} />
-                </div>
-            );
-        }
+                    });
+                }}
+                onDrop={() => dropHandler(childrenRef)}
+                className="absolute p-2"
+                style={{
+                    width,
+                    height,
+                    top,
+                    left,
+                }}
+            >
+                <Component childrenRef={childrenRef} />
+            </div>
+        );
     },
     (prev, next) => {
         return (

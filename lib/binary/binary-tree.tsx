@@ -152,18 +152,18 @@ class BinaryTree {
         if (orientation === 'verticality') {
             return {
                 id,
-                width: 1,
+                width: 8,
                 height,
                 top,
-                left: left + width * radio,
+                left: left + width * radio - 4,
                 componentName: 'SplitComponent',
             };
         }
         return {
             id,
             width,
-            height: 1,
-            top: top + height * radio,
+            height: 8,
+            top: top + height * radio - 4,
             left,
             componentName: 'SplitComponent',
         };
@@ -348,6 +348,7 @@ class BinaryTree {
             : 'verticality';
 
         const sourceNode = this.findPanelNode(sourceId)!;
+
         const destinyNode = this.findPanelNode(destinyId)!;
 
         const parentOfSource = this.findParentOfNode(sourceId)!;
